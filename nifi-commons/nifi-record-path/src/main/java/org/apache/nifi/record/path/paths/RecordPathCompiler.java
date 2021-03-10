@@ -252,8 +252,15 @@ public class RecordPathCompiler {
                         return new FieldName(args[0], absolute);
                     }
                     case "toDate": {
-                        final RecordPathSegment[] args = getArgPaths(argumentListTree, 2, functionName, absolute);
-                        return new ToDate(args[0], args[1], absolute);
+                        final int numArgs = argumentListTree.getChildCount();
+
+                        if (numArgs == 2) {
+                            final RecordPathSegment[] args = getArgPaths(argumentListTree, 2, functionName, absolute);
+                            return new ToDate(args[0], args[1], absolute);
+                        } else {
+                            final RecordPathSegment[] args = getArgPaths(argumentListTree, 3, functionName, absolute);
+                            return new ToDate(args[0], args[1], args[2], absolute);
+                        }
                     }
                     case "toString": {
                         final RecordPathSegment[] args = getArgPaths(argumentListTree, 2, functionName, absolute);
@@ -268,8 +275,15 @@ public class RecordPathCompiler {
                         return new ToLong(args[0], absolute);
                     }
                     case "format": {
-                        final RecordPathSegment[] args = getArgPaths(argumentListTree, 2, functionName, absolute);
-                        return new Format(args[0], args[1], absolute);
+                        final int numArgs = argumentListTree.getChildCount();
+
+                        if (numArgs == 2) {
+                            final RecordPathSegment[] args = getArgPaths(argumentListTree, 2, functionName, absolute);
+                            return new Format(args[0], args[1], absolute);
+                        } else {
+                            final RecordPathSegment[] args = getArgPaths(argumentListTree, 3, functionName, absolute);
+                            return new Format(args[0], args[1], args[2], absolute);
+                        }
                     }
                     case "base64Encode": {
                         final RecordPathSegment[] args = getArgPaths(argumentListTree, 1, functionName, absolute);
@@ -288,6 +302,17 @@ public class RecordPathCompiler {
         }
 
         throw new RecordPathException("Encountered unexpected token " + tree);
+    }
+
+    private static RecordPathSegment[] getArgumentsForStringFunction(boolean absolute, Tree argumentListTree) {
+        final int numArgs = argumentListTree.getChildCount();
+
+        final RecordPathSegment[] argPaths = new RecordPathSegment[numArgs];
+        for (int i = 0; i < numArgs; i++) {
+            argPaths[i] = buildPath(argumentListTree.getChild(i), null, absolute);
+        }
+
+        return argPaths;
     }
 
     private static RecordPathFilter createFilter(final Tree operatorTree, final RecordPathSegment parent, final boolean absolute) {
